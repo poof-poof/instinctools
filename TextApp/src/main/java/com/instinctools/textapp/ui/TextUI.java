@@ -3,6 +3,7 @@ package com.instinctools.textapp.ui;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.*;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -10,6 +11,7 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.List;
+import java.util.Scanner;
 
 @SpringUI
 public class TextUI extends UI {
@@ -18,6 +20,13 @@ public class TextUI extends UI {
     private static final String BRACKETS_TITLE_BTN = "Проверить скобки";
     private static final String WORDS_DATA = "words";
     private static final String BRACKETS_DATA = "brackets";
+    private static final String ERROR_TYPE_MSG = "Ошибка! Выберите файл формата *.txt!";
+
+    @Value("${textapp.file.type}")
+    private String MIME_TYPE;
+
+    @Value("${textapp.uploads.path}")
+    private String UPLOADS_PATH;
 
     private Upload words;
     private Upload brackets;
@@ -32,17 +41,17 @@ public class TextUI extends UI {
     protected void init(VaadinRequest vaadinRequest) {
         words = new Upload();
         brackets = new Upload();
-        receiver = new FileReceiver();
         log = new TextArea("Результаты:");
-        buttons = new HorizontalLayout(words,brackets);
-        layout = new VerticalLayout(buttons,log);
+        receiver = new FileReceiver(UPLOADS_PATH);
+        buttons = new HorizontalLayout(words, brackets);
+        layout = new VerticalLayout(buttons, log);
 
         log.setSizeFull();
         layout.setSizeFull();
         layout.setMargin(true);
 
-        layout.setExpandRatio(buttons,0.1f);
-        layout.setExpandRatio(log,0.9f);
+        layout.setExpandRatio(buttons, 0.1f);
+        layout.setExpandRatio(log, 0.9f);
 
         words.setButtonCaption(WORDS_TITLE_BTN);
         brackets.setButtonCaption(BRACKETS_TITLE_BTN);
@@ -54,22 +63,37 @@ public class TextUI extends UI {
         brackets.setReceiver(receiver);
 
         words.addSucceededListener(e -> {
-            log.clear();
-            getData(e.getFilename(),true);
+            if (MIME_TYPE.equals(e.getMIMEType())) {
+                log.clear();
+                getData(e.getFilename(), true);
+            } else {
+                Notification.show(ERROR_TYPE_MSG, Notification.Type.ERROR_MESSAGE);
+                removeFileFromServer(e.getFilename());
+            }
         });
-        brackets.addSucceededListener(e ->{
-            log.clear();
-            getData(e.getFilename(),false);
+        brackets.addSucceededListener(e -> {
+            if (MIME_TYPE.equals(e.getMIMEType())) {
+                log.clear();
+                getData(e.getFilename(), false);
+            } else {
+                Notification.show(ERROR_TYPE_MSG, Notification.Type.ERROR_MESSAGE);
+                removeFileFromServer(e.getFilename());
+            }
         });
 
         setContent(layout);
     }
 
-    private void putLog(String text){
+    private void removeFileFromServer(String filename) {
+        File f = new File(System.getProperty("user.dir") + UPLOADS_PATH + "/" + filename);
+        f.delete();
+    }
+
+    private void putLog(String text) {
         log.setValue(log.getValue() + text + '\n');
     }
 
-    private void getData(String fileName,boolean type){
+    private void getData(String fileName, boolean type) {
         try {
             URL url = new URL("http://localhost:8080/" + ((type) ? WORDS_DATA : BRACKETS_DATA));
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -80,10 +104,9 @@ public class TextUI extends UI {
             dos.write(fileName.getBytes("UTF-8"));
             dos.flush();
             dos.close();
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            String inputLine;
-            while ((inputLine = in.readLine()) != null) {
-                putLog(inputLine);
+            Scanner in = new Scanner(connection.getInputStream(), "UTF-8");
+            while (in.hasNextLine()) {
+                putLog(in.nextLine());
             }
             in.close();
             connection.disconnect();

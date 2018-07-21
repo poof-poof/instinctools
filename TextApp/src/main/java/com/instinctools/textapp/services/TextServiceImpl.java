@@ -6,11 +6,11 @@ import org.springframework.stereotype.Service;
 public class TextServiceImpl implements TextService {
     @Override
     public String topWords(String fileName) {
-        return null;
+        return "Words file name: " + fileName;
     }
 
     @Override
     public String checkBrackets(String fileName) {
-        return null;
+        return "Brackets file name: " + fileName;
     }
 }
