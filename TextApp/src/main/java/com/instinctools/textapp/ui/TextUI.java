@@ -45,6 +45,7 @@ public class TextUI extends UI {
         receiver = new FileReceiver(UPLOADS_PATH);
         buttons = new HorizontalLayout(words, brackets);
         layout = new VerticalLayout(buttons, log);
+        UPLOADS_PATH = System.getProperty("user.dir") + UPLOADS_PATH;
 
         log.setSizeFull();
         layout.setSizeFull();
@@ -85,7 +86,7 @@ public class TextUI extends UI {
     }
 
     private void removeFileFromServer(String filename) {
-        File f = new File(System.getProperty("user.dir") + UPLOADS_PATH + "/" + filename);
+        File f = new File(UPLOADS_PATH + filename);
         f.delete();
     }
 
@@ -101,6 +102,7 @@ public class TextUI extends UI {
             connection.setDoOutput(true);
             connection.setRequestProperty("Content-Type", "text/plane; charset=UTF-8");
             DataOutputStream dos = new DataOutputStream(connection.getOutputStream());
+            fileName = UPLOADS_PATH + fileName;
             dos.write(fileName.getBytes("UTF-8"));
             dos.flush();
             dos.close();
