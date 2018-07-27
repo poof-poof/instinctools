@@ -49,8 +49,16 @@ public class TextServiceImpl implements TextService {
     @Override
     public String checkBrackets(String fileName) {
         StringBuffer sb = getDataFromFile(fileName);
-        //todo
-        return FAIL_BRACKETS;
+        String line = sb.toString().replaceAll("\\p{Alnum}","");
+        line = line.replaceAll("\\p{Space}","");
+        while (line.length() != 0){
+            line = line.replaceAll("\\[\\]","");
+            line = line.replaceAll("\\(\\)","");
+            line = line.replaceAll("\\{\\}","");
+            if(line.length() % 2 != 0 || (line.length() % 2 == 0 && (line.contains("}{") || line.contains(")(") || line.contains("]["))))
+                return FAIL_BRACKETS;
+        }
+        return OK_BRACKETS;
     }
 
     private StringBuffer getDataFromFile(String fileName) {
