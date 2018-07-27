@@ -13,19 +13,18 @@ public class TextServiceImpl implements TextService {
     private static final String OK_BRACKETS = "correct";
     private static final String FAIL_BRACKETS = "incorrect";
 
-    private List<String> wordBook = new ArrayList<>();
+    private List<String> wordBook;
     private Comparator myComp;
 
     @Override
     public String topWords(String fileName) {
         StringBuffer sb = getDataFromFile(fileName);
         Map<String, Long> words = new HashMap<>();
-        String lineText = sb.toString();
+        String lineText = sb.toString().toLowerCase();
         lineText = lineText.replaceAll("\\p{Punct}", "");
         String[] arr = lineText.split(" ");
-
         for (int i = 0; i < arr.length; i++) {
-            if (!wordBook.contains(arr[i])) {
+            if (!arr[i].toLowerCase().equals("") && !wordBook.contains(arr[i]) ) {
                 if (!words.containsKey(arr[i].toLowerCase())) {
                     words.put(arr[i].toLowerCase(), 1l);
                 } else {
@@ -75,5 +74,16 @@ public class TextServiceImpl implements TextService {
     @PostConstruct
     private void init() {
         myComp = (o1, o2) -> ((Long) ((Map.Entry) o2).getValue()).compareTo(((Long) ((Map.Entry) o1).getValue()));
+        wordBook = new ArrayList<>();
+        String[] arr = {
+               "а","абы","аж","ан","благо","буде","будто","вроде","да","дабы","даже","едва","ежели","если","же","затем",
+                "зато","и","ибо","или","итак","кабы","как","когда","коли","коль","ли","либо","лишь","нежели","но","пока",
+                "покамест","покуда","поскольку","притом","причем","пускай","пусть","раз","разве","ровно","сиречь",
+                "словно","так","также","тоже","только","точно","хоть","хотя","чем","чисто","что","чтоб","чтобы","чуть",
+                "якобы","в","без","до","из","к","на","по","о","от","перед","при","через","с","у","за","над","об","под",
+                "про","для"
+        };
+        for (int i = 0; i < arr.length; i++)
+            wordBook.add(arr[i]);
     }
 }
