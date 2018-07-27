@@ -21,7 +21,7 @@ public class TextServiceImpl implements TextService {
         StringBuffer sb = getDataFromFile(fileName);
         Map<String, Long> words = new HashMap<>();
         String lineText = sb.toString().toLowerCase();
-        lineText = lineText.replaceAll("\\p{Punct}", "");
+        lineText = lineText.replaceAll("\\p{Punct}", "");//remove !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
         String[] arr = lineText.split(" ");
         for (int i = 0; i < arr.length; i++) {
             if (!arr[i].toLowerCase().equals("") && !wordBook.contains(arr[i]) ) {
@@ -48,7 +48,7 @@ public class TextServiceImpl implements TextService {
     @Override
     public String checkBrackets(String fileName) {
         StringBuffer sb = getDataFromFile(fileName);
-        String line = sb.toString().replaceAll("\\p{Alnum}","");
+        String line = sb.toString().replaceAll("\\p{Alnum}","");//remove digits and charcters
         line = line.replaceAll("\\p{Space}","");
         while (line.length() != 0){
             line = line.replaceAll("\\[\\]","");
@@ -73,6 +73,7 @@ public class TextServiceImpl implements TextService {
 
     @PostConstruct
     private void init() {
+        //my comparator for sort list words DSC
         myComp = (o1, o2) -> ((Long) ((Map.Entry) o2).getValue()).compareTo(((Long) ((Map.Entry) o1).getValue()));
         wordBook = new ArrayList<>();
         String[] arr = {

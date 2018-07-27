@@ -1,3 +1,7 @@
+/*
+ * Simple rest controller.
+ */
+
 package com.instinctools.textapp.controllers;
 
 import com.instinctools.textapp.services.TextService;
