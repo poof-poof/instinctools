@@ -1,8 +1,6 @@
 package com.instinctools.textapp.ui;
 
-import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.Upload;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.io.File;
 import java.io.FileNotFoundException;

@@ -62,7 +62,7 @@ public class TextServiceImpl implements TextService {
 
     private StringBuffer getDataFromFile(String fileName) {
         StringBuffer sb = new StringBuffer();
-        try (Scanner sc = new Scanner(new FileInputStream(fileName))) {
+        try (Scanner sc = new Scanner(new FileInputStream(fileName), "UTF-8")) {
             while (sc.hasNextLine())
                 sb.append(sc.nextLine());
         } catch (IOException e) {
